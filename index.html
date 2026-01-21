@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario Compartido</title>
+    <title>Inventario UwU</title>
     <style>
         :root { --p-light: #d4a5bc; --p-dark: #4a2c3a; --bg: #fdf6f9; --p-accent: #c07da0; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
@@ -39,7 +39,7 @@
 </head>
 <body>
 
-    <div id="loading-overlay">Actualizando...</div>
+    <div id="loading-overlay">Actualizando inventario...</div>
 
     <h1>Inventario</h1>
     
@@ -66,7 +66,7 @@
         <div id="listContainer"></div>
     </div>
 
-    <button id="btnSave" class="btn-save-all" onclick="saveAllChanges()">💾 Guardar Todo</button>
+    <button id="btnSave" class="btn-save-all" onclick="saveAllChanges()">💾 GUARDAR TODO</button>
 
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwsO41veRFVbzPLycyBRC17lynjy_DzEwzyusDr2UWQvryFCn7ISwRg6HmIBLvkUqTHsA/exec'; 
@@ -78,35 +78,40 @@
         };
 
         function formatRelativeTime(dateStr) {
-            if (!dateStr || dateStr === '---') return 'Sin registros';
+            if (!dateStr || dateStr === '---' || dateStr === '-') return 'Sin registros';
             
-            // Convertimos la fecha del Excel (UTC) a la hora local del navegador
-            const past = new Date(dateStr);
-            if (isNaN(past.getTime())) return 'Fecha inválida';
-
+            // Forzamos la limpieza del formato de fecha de Google
+            let cleanDate = dateStr.replace('T', ' ').replace('Z', '').split('.')[0];
+            const past = new Date(cleanDate);
             const now = new Date();
-            const diffInMs = now - past;
-            const diffInSecs = Math.floor(diffInMs / 1000);
-            const diffInMins = Math.floor(diffInSecs / 60);
+            
+            // Si la fecha es inválida, intentamos parsear directo
+            const dateObj = isNaN(past.getTime()) ? new Date(dateStr) : past;
+            if (isNaN(dateObj.getTime())) return 'Fecha pendiente';
+
+            const diffInMs = now - dateObj;
+            const diffInMins = Math.floor(diffInMs / 60000);
             const diffInHours = Math.floor(diffInMins / 60);
 
-            // Si la diferencia es negativa o muy pequeña, fue "ahora"
-            if (diffInMins < 1) return 'Hace un momento';
-            if (diffInMins < 60) return `Hace ${diffInMins} min`;
-            if (diffInHours < 24) return `Hace ${diffInHours} h`;
+            // Ajuste por desfase horario (si sale negativo o muy grande por el servidor)
+            if (diffInMins < 1 && diffInMins > -60) return 'Hace un momento';
+            if (diffInMins >= 1 && diffInMins < 60) return `Hace ${diffInMins} min`;
+            if (diffInHours >= 1 && diffInHours < 24) return `Hace ${diffInHours} h`;
             
-            return past.toLocaleDateString(undefined, {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+            return dateObj.toLocaleDateString();
         }
 
         async function loadFromSheet() {
-            showLoading("Cargando inventario...");
+            document.getElementById('loading-overlay').style.display = 'flex';
             try {
                 const response = await fetch(WEB_APP_URL);
                 inventoryData = await response.json();
-                hideLoading();
+                document.getElementById('loading-overlay').style.display = 'none';
                 document.getElementById('mainCard').style.display = 'block';
                 renderInventory();
-            } catch (e) { showLoading("Error de conexión"); }
+            } catch (e) { 
+                document.getElementById('loading-overlay').innerText = "Error de conexión"; 
+            }
         }
 
         function renderInventory() {
@@ -117,7 +122,7 @@
 
             for (let i = 2; i < inventoryData.length; i++) {
                 const row = inventoryData[i];
-                if (!row[0] || row[0] === "Producto") continue;
+                if (!row[0] || row[0].toLowerCase() === "producto") continue;
 
                 const nameLower = row[0].toLowerCase().trim();
                 const emoji = emojis[nameLower] || "📦";
@@ -144,4 +149,29 @@
                 if (!isNaN(val) && val !== 0) {
                     updates.push({
                         producto: input.getAttribute('data-prod'),
-                        cantidad:
+                        cantidad: val,
+                        userCol: parseInt(input.getAttribute('data-col'))
+                    });
+                }
+            });
+
+            if (updates.length === 0) return alert("No hay cantidades nuevas para guardar.");
+
+            document.getElementById('loading-overlay').style.display = 'flex';
+            document.getElementById('loading-overlay').innerText = "Guardando cambios...";
+            
+            for (let up of updates) {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(up)
+                });
+            }
+
+            setTimeout(() => { location.reload(); }, 1000);
+        }
+
+        loadFromSheet();
+    </script>
+</body>
+</html>
