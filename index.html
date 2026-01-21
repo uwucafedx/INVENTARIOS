@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario Compartido</title>
+    <style>
+        :root { 
+            --pink-light: #d4a5bc; 
+            --pink-dark: #4a2c3a; 
+            --bg: #fdf6f9; 
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: var(--bg); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 10px; 
+            margin: 0;
+        }
+        h1 { color: var(--pink-dark); letter-spacing: 3px; margin-bottom: 5px; text-transform: uppercase; }
+        .instructions { font-size: 0.8em; color: var(--pink-dark); text-align: center; max-width: 400px; margin-bottom: 20px; font-style: italic; font-weight: bold; }
+        
+        .user-box { margin-bottom: 20px; font-weight: bold; color: var(--pink-dark); }
+        select { padding: 10px; border-radius: 8px; border: 2px solid var(--pink-light); background: white; cursor: pointer; font-weight: bold; }
+
+        .inventory-card { 
+            background: var(--pink-dark); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 20px; 
+            width: 95%; 
+            max-width: 500px; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .header-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; border-bottom: 2px solid var(--pink-light); padding-bottom: 8px; }
+        
+        .row { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-bottom: 15px; 
+            gap: 10px;
+            border-bottom: 1px solid rgba(212, 165, 188, 0.2);
+            padding-bottom: 10px;
+        }
+        .prod-info { flex: 1; }
+        .prod-name { font-size: 0.95em; font-weight: bold; text-transform: capitalize; }
+        .last-mod { font-size: 0.65em; color: #ffc1e3; margin-top: 4px; }
+        
+        .qty-box { 
+            background: var(--pink-light); 
+            color: var(--pink-dark); 
+            min-width: 45px; 
+            height: 35px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 1.1em;
+        }
+        
+        input[type="number"] { width: 60px; padding: 8px; border-radius: 8px; border: none; text-align: center; font-weight: bold; }
+        
+        button { 
+            background: #8e5d74; 
+            color: white; 
+            border: none; 
+            padding: 10px 15px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover { background: var(--pink-light); color: var(--pink-dark); }
+
+        #loading-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.8); display: flex; justify-content: center; 
+            align-items: center; z-index: 1000; color: var(--pink-dark); font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay">Cargando inventario...</div>
+
+    <h1>Inventario</h1>
+    <p class="instructions">MENÚ DESPLEGABLE DONDE DEBERÁN ELEGIR SU NOMBRE Y SE DESPLEGARÁ EL LISTADO PARA RELLENAR LO QUE TENGAN EN SU PROPIEDAD</p>
+
+    <div class="user-box">
+        USUARIO: 
+        <select id="userSelect" onchange="renderInventory()">
+            <option value="GIULY">GIULY</option>
+            <option value="ALEX">ALEX</option>
+            <option value="NASHIRA">NASHIRA</option>
+        </select>
+    </div>
+
+    <div class="inventory-card" id="mainCard" style="display:none;">
+        <div class="header-row">
+            <span>PRODUCTO</span>
+            <span>CANTIDAD</span>
+        </div>
+        <div id="listContainer"></div>
+    </div>
+
+    <script>
+        //https://script.google.com/macros/s/AKfycbwsO41veRFVbzPLycyBRC17lynjy_DzEwzyusDr2UWQvryFCn7ISwRg6HmIBLvkUqTHsA/exec
+        const WEB_APP_URL = 'TU_URL_AQUI'; 
+
+        let inventoryData = [];
+
+        async function loadFromSheet() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+            try {
+                const response = await fetch(WEB_APP_URL);
+                inventoryData = await response.json();
+                document.getElementById('loading-overlay').style.display = 'none';
+                document.getElementById('mainCard').style.display = 'block';
+                renderInventory();
+            } catch (error) {
+                alert("Error al cargar datos. Verifica la URL de Google Script.");
+            }
+        }
+
+        function renderInventory() {
+            const user = document.getElementById('userSelect').value;
+            const container = document.getElementById('listContainer');
+            container.innerHTML = '';
+
+            // Mapeo de columnas: GIULY=1, ALEX=3, NASHIRA=5 (basado en tu Excel)
+            const colIdx = (user === "GIULY") ? 1 : (user === "ALEX") ? 3 : 5;
+
+            // i=1 para saltar los encabezados
+            for (let i = 1; i < inventoryData.length; i++) {
+                const rowData = inventoryData[i];
+                if (!rowData[0]) continue; // Saltar filas vacías
+
+                const rowHtml = `
+                    <div class="row">
+                        <div class="prod-info">
+                            <div class="prod-name">${rowData[0]}</div>
+                            <div class="last-mod">Última mod: ${rowData[colIdx+1] || 'Sin datos'}</div>
+                        </div>
+                        <div class="qty-box">${rowData[colIdx] || 0}</div>
+                        <input type="number" id="input-${i}" placeholder="+/-">
+                        <button onclick="updateStock('${rowData[0]}', ${i}, ${colIdx})">OK</button>
+                    </div>
+                `;
+                container.innerHTML += rowHtml;
+            }
+        }
+
+        async function updateStock(productName, rowIndex, colIndex) {
+            const inputField = document.getElementById(`input-${rowIndex}`);
+            const amount = parseInt(inputField.value);
+            
+            if (isNaN(amount)) {
+                alert("Por favor ingresa un número (ej: 100 o -20)");
+                return;
+            }
+
+            document.getElementById('loading-overlay').innerText = "Guardando en la nube...";
+            document.getElementById('loading-overlay').style.display = 'flex';
+
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        producto: productName,
+                        cantidad: amount,
+                        userCol: colIndex
+                    })
+                });
+
+                // Esperamos un segundo y recargamos para ver los datos frescos de todos
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+
+            } catch (error) {
+                alert("Error al guardar.");
+                document.getElementById('loading-overlay').style.display = 'none';
+            }
+        }
+
+        // Iniciar carga al abrir la página
+        loadFromSheet();
+    </script>
+</body>
+</html>
