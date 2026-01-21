@@ -10,16 +10,9 @@
         h1 { color: var(--p-dark); letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; margin-bottom: 5px; }
         
         .nota-informativa {
-            background: #fff0f6;
-            color: #8e5d74;
-            border: 2px dashed var(--p-light);
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            text-align: center;
-            max-width: 500px;
-            margin-bottom: 20px;
-            line-height: 1.4;
+            background: #fff0f6; color: #8e5d74; border: 2px dashed var(--p-light);
+            padding: 12px; border-radius: 12px; font-size: 0.85em; text-align: center;
+            max-width: 500px; margin-bottom: 20px; line-height: 1.4;
         }
 
         .user-box { margin-bottom: 20px; font-weight: bold; color: var(--p-dark); }
@@ -31,24 +24,15 @@
         .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; gap: 10px; border-bottom: 1px solid rgba(212, 165, 188, 0.2); padding-bottom: 10px; }
         .prod-info { flex: 1.5; }
         .prod-name { font-size: 0.95em; font-weight: bold; text-transform: uppercase; }
-        .last-mod { font-size: 0.65em; color: #ffc1e3; margin-top: 4px; }
+        .last-mod { font-size: 0.65em; color: #ffc1e3; margin-top: 4px; font-style: italic; }
         
         .qty-box { background: var(--p-light); color: var(--p-dark); min-width: 50px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; }
         input[type="number"] { width: 65px; padding: 8px; border-radius: 8px; border: none; text-align: center; font-weight: bold; }
         
         .btn-save-all { 
-            background: var(--p-accent); 
-            color: white; 
-            border: 2px solid var(--p-light); 
-            padding: 18px; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 1.1em; 
-            width: 95%; 
-            max-width: 550px; 
-            margin-bottom: 40px; 
-            text-transform: uppercase;
+            background: var(--p-accent); color: white; border: 2px solid var(--p-light); 
+            padding: 18px; border-radius: 12px; cursor: pointer; font-weight: bold; 
+            font-size: 1.1em; width: 95%; max-width: 550px; margin-bottom: 40px; text-transform: uppercase;
         }
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: var(--p-dark); font-weight: bold; }
     </style>
@@ -60,8 +44,8 @@
     <h1>Inventario</h1>
     
     <div class="nota-informativa">
-        📢 <b>Recordatorio importante:</b><br>
-        Si retiran productos, ingresen la cantidad en <b>negativo</b> (ej: -5) para restar del stock. Si guardan productos nuevos, ingresen en <b>positivo</b>.
+        📢 <b>Recordatorio:</b><br>
+        Usa números <b>negativos</b> para lo que sacas y <b>positivos</b> para lo nuevo.
     </div>
 
     <div class="user-box">
@@ -93,6 +77,24 @@
             "aguas carbonatadas": "🥤", "naranja": "🍊", "piña": "🍍", "fresa": "🍓", "manzana": "🍎"
         };
 
+        // Función para calcular tiempo relativo o local
+        function formatRelativeTime(dateInput) {
+            if (!dateInput || dateInput === '---') return 'Sin registros';
+            
+            const now = new Date();
+            const past = new Date(dateInput);
+            const diffInMs = now - past;
+            const diffInMins = Math.floor(diffInMs / (1000 * 60));
+            const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+
+            if (diffInMins < 1) return 'Hace un momento';
+            if (diffInMins < 60) return `Hace ${diffInMins} min`;
+            if (diffInHours < 24) return `Hace ${diffInHours} h`;
+            
+            // Si pasó más de un día, mostrar fecha local del usuario
+            return past.toLocaleDateString(undefined, {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+        }
+
         async function loadFromSheet() {
             showLoading("Cargando inventario...");
             try {
@@ -116,30 +118,13 @@
 
                 const nameLower = row[0].toLowerCase().trim();
                 const emoji = emojis[nameLower] || "📦";
-                
-                let dateStr = row[colIdx+1] || '---';
-                
-                // --- CORRECCIÓN DE HORA PARA ARGENTINA ---
-                if(dateStr !== '---') {
-                    const fechaObj = new Date(dateStr);
-                    if (!isNaN(fechaObj.getTime())) {
-                        dateStr = fechaObj.toLocaleString('es-AR', {
-                            timeZone: 'America/Argentina/Buenos_Aires',
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                        });
-                    }
-                }
+                const relativeTime = formatRelativeTime(row[colIdx+1]);
 
                 container.innerHTML += `
                     <div class="row">
                         <div class="prod-info">
                             <div class="prod-name">${emoji} ${row[0]}</div>
-                            <div class="last-mod">Última mod: ${dateStr}</div>
+                            <div class="last-mod">Modificado: ${relativeTime}</div>
                         </div>
                         <div class="qty-box">${row[colIdx] || 0}</div>
                         <input type="number" class="qty-input" data-prod="${row[0]}" data-col="${colIdx}" placeholder="0">
@@ -164,7 +149,7 @@
 
             if (updates.length === 0) return alert("No hay cambios para guardar.");
 
-            showLoading("Guardando en el Excel...");
+            showLoading("Guardando cambios...");
             
             for (let up of updates) {
                 await fetch(WEB_APP_URL, {
