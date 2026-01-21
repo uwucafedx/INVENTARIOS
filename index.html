@@ -7,12 +7,12 @@
     <style>
         :root { --p-light: #d4a5bc; --p-dark: #4a2c3a; --bg: #fdf6f9; --p-accent: #c07da0; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
-        h1 { color: var(--p-dark); letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; margin-bottom: 5px; }
+        h1 { color: var(--p-dark); letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; }
         
         .nota-informativa {
             background: #fff0f6; color: #8e5d74; border: 2px dashed var(--p-light);
             padding: 12px; border-radius: 12px; font-size: 0.85em; text-align: center;
-            max-width: 500px; margin-bottom: 20px; line-height: 1.4;
+            max-width: 500px; margin-bottom: 20px;
         }
 
         .user-box { margin-bottom: 20px; font-weight: bold; color: var(--p-dark); }
@@ -39,13 +39,13 @@
 </head>
 <body>
 
-    <div id="loading-overlay">Procesando...</div>
+    <div id="loading-overlay">Actualizando...</div>
 
     <h1>Inventario</h1>
     
     <div class="nota-informativa">
         📢 <b>Recordatorio:</b><br>
-        Usa números <b>negativos</b> para lo que sacas y <b>positivos</b> para lo nuevo.
+        Negativos para sacar (ej: -5), Positivos para sumar (ej: 10).
     </div>
 
     <div class="user-box">
@@ -77,21 +77,24 @@
             "aguas carbonatadas": "🥤", "naranja": "🍊", "piña": "🍍", "fresa": "🍓", "manzana": "🍎"
         };
 
-        // Función para calcular tiempo relativo o local
-        function formatRelativeTime(dateInput) {
-            if (!dateInput || dateInput === '---') return 'Sin registros';
+        function formatRelativeTime(dateStr) {
+            if (!dateStr || dateStr === '---') return 'Sin registros';
             
-            const now = new Date();
-            const past = new Date(dateInput);
-            const diffInMs = now - past;
-            const diffInMins = Math.floor(diffInMs / (1000 * 60));
-            const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+            // Convertimos la fecha del Excel (UTC) a la hora local del navegador
+            const past = new Date(dateStr);
+            if (isNaN(past.getTime())) return 'Fecha inválida';
 
+            const now = new Date();
+            const diffInMs = now - past;
+            const diffInSecs = Math.floor(diffInMs / 1000);
+            const diffInMins = Math.floor(diffInSecs / 60);
+            const diffInHours = Math.floor(diffInMins / 60);
+
+            // Si la diferencia es negativa o muy pequeña, fue "ahora"
             if (diffInMins < 1) return 'Hace un momento';
             if (diffInMins < 60) return `Hace ${diffInMins} min`;
             if (diffInHours < 24) return `Hace ${diffInHours} h`;
             
-            // Si pasó más de un día, mostrar fecha local del usuario
             return past.toLocaleDateString(undefined, {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
         }
 
@@ -141,36 +144,4 @@
                 if (!isNaN(val) && val !== 0) {
                     updates.push({
                         producto: input.getAttribute('data-prod'),
-                        cantidad: val,
-                        userCol: parseInt(input.getAttribute('data-col'))
-                    });
-                }
-            });
-
-            if (updates.length === 0) return alert("No hay cambios para guardar.");
-
-            showLoading("Guardando cambios...");
-            
-            for (let up of updates) {
-                await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(up)
-                });
-            }
-
-            setTimeout(() => { location.reload(); }, 800);
-        }
-
-        function showLoading(msg) {
-            const loader = document.getElementById('loading-overlay');
-            loader.innerText = msg;
-            loader.style.display = 'flex';
-        }
-
-        function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
-
-        loadFromSheet();
-    </script>
-</body>
-</html>
+                        cantidad:
