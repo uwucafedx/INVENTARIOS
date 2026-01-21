@@ -7,9 +7,23 @@
     <style>
         :root { --p-light: #d4a5bc; --p-dark: #4a2c3a; --bg: #fdf6f9; --p-accent: #c07da0; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
-        h1 { color: var(--p-dark); letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; }
-        .instructions { font-size: 0.8em; color: var(--p-dark); text-align: center; max-width: 400px; margin-bottom: 20px; font-weight: bold; }
+        h1 { color: var(--p-dark); letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; margin-bottom: 5px; }
         
+        /* ESTILO DE LA NOTA DE RECORDATORIO */
+        .nota-informativa {
+            background: #fff0f6;
+            color: #8e5d74;
+            border: 2px dashed var(--p-light);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            text-align: center;
+            max-width: 500px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+        }
+
         .user-box { margin-bottom: 20px; font-weight: bold; color: var(--p-dark); }
         select { padding: 10px; border-radius: 8px; border: 2px solid var(--p-light); background: white; cursor: pointer; }
 
@@ -24,7 +38,6 @@
         .qty-box { background: var(--p-light); color: var(--p-dark); min-width: 50px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; }
         input[type="number"] { width: 65px; padding: 8px; border-radius: 8px; border: none; text-align: center; font-weight: bold; }
         
-        /* BOTÓN GUARDAR TODO EN GAMA ROSA */
         .btn-save-all { 
             background: var(--p-accent); 
             color: white; 
@@ -53,7 +66,11 @@
     <div id="loading-overlay">Procesando...</div>
 
     <h1>Inventario</h1>
-    <p class="instructions">RELLENA LAS CANTIDADES Y DALE A GUARDAR AL FINAL</p>
+    
+    <div class="nota-informativa">
+        📢 <b>Recordatorio importante:</b><br>
+        Si retiran productos, ingresen la cantidad en <b>negativo</b> (ej: -5) para restar del stock. Si guardan productos nuevos, ingresen en <b>positivo</b>.
+    </div>
 
     <div class="user-box">
         USUARIO: 
