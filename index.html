@@ -9,10 +9,9 @@
         
         body { 
             font-family: 'Segoe UI', sans-serif; 
-            /* SE CORRIGIÓ EL NOMBRE DEL ARCHIVO AQUÍ ABAJO */
-            background: #000 url('Diseño sin título (12).png') no-repeat center center fixed; 
+            /* SE CORRIGIÓ EL NOMBRE CON COMILLAS PARA LOS ESPACIOS */
+            background: #000 url("./Diseño sin título (12).png") no-repeat center center fixed; 
             background-size: cover;
-            /* -------------------------------------------- */
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -20,10 +19,11 @@
             margin: 0; 
         }
 
-        h1 { color: #fff; letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+        h1 { color: #fff; letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
         
+        /* RECORDATORIO RESTAURADO */
         .nota-informativa {
-            background: rgba(255, 240, 246, 0.85);
+            background: rgba(255, 240, 246, 0.9);
             color: #8e5d74;
             border: 2px dashed var(--p-light);
             padding: 12px;
@@ -32,14 +32,15 @@
             text-align: center;
             max-width: 500px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            line-height: 1.4;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .user-box { 
             margin-bottom: 20px; 
             font-weight: bold; 
             color: #fff; 
-            background: rgba(74, 44, 58, 0.6); 
+            background: rgba(74, 44, 58, 0.7); 
             padding: 10px; 
             border-radius: 10px; 
         }
@@ -47,15 +48,15 @@
         select { padding: 10px; border-radius: 8px; border: 2px solid var(--p-light); background: white; cursor: pointer; }
 
         .inventory-card { 
-            background: rgba(40, 40, 40, 0.85); /* Más oscuro para que combine con tu fondo negro */
+            background: rgba(40, 40, 40, 0.85); 
             color: white; 
             padding: 20px; 
             border-radius: 20px; 
             width: 95%; 
             max-width: 550px; 
-            box-shadow: 0 8px 30px rgba(0,0,0,0.7); 
+            box-shadow: 0 8px 30px rgba(0,0,0,0.8); 
             margin-bottom: 20px; 
-            backdrop-filter: blur(5px); /* Efecto de vidrio esmerilado */
+            backdrop-filter: blur(5px);
         }
 
         .header-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; border-bottom: 2px solid var(--p-light); padding-bottom: 10px; }
@@ -79,7 +80,6 @@
             max-width: 550px; 
             margin-bottom: 40px; 
             text-transform: uppercase;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; font-weight: bold; }
@@ -87,10 +87,42 @@
 </head>
 <body>
 
-    <div id="loading-overlay">Procesando cambios...</div>
+    <div id="loading-overlay">Guardando cambios...</div>
 
     <h1>Inventario</h1>
     
     <div class="nota-informativa">
         📢 <b>Recordatorio importante:</b><br>
-        Si retiran productos, ingresen la cantidad en <b>negativo</b> (ej: -5). Si guardan
+        Si retiran productos, ingresen la cantidad en <b>negativo</b> (ej: -5). Si guardan nuevos, ingresen en <b>positivo</b>.
+    </div>
+
+    <div class="user-box">
+        USUARIO: 
+        <select id="userSelect" onchange="renderInventory()">
+            <option value="GIULY">GIULY</option>
+            <option value="ALEX">ALEX</option>
+            <option value="NASHIRA">NASHIRA</option>
+        </select>
+    </div>
+
+    <div class="inventory-card" id="mainCard" style="display:none;">
+        <div class="header-row">
+            <span>PRODUCTO</span>
+            <span>STOCK</span>
+            <span>CARGAR</span>
+        </div>
+        <div id="listContainer"></div>
+    </div>
+
+    <button id="btnSave" class="btn-save-all" onclick="saveAllChanges()">💾 GUARDAR TODO</button>
+
+    <script>
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwsO41veRFVbzPLycyBRC17lynjy_DzEwzyusDr2UWQvryFCn7ISwRg6HmIBLvkUqTHsA/exec'; 
+        let inventoryData = [];
+
+        const emojis = {
+            "carne de venado": "🦌", "losa de carne": "🥩", "jamon": "🍖", "bolonias": "🥪",
+            "aguas carbonatadas": "🥤", "naranja": "🍊", "piña": "🍍", "fresa": "🍓", "manzana": "🍎"
+        };
+
+        function
