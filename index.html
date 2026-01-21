@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventario Compartido</title>
     <style>
-        :root { --p-light: #d4a5bc; --p-dark: #4a2c3a; --bg: #fdf6f9; }
+        :root { --p-light: #d4a5bc; --p-dark: #4a2c3a; --bg: #fdf6f9; --p-accent: #c07da0; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
         h1 { color: var(--p-dark); letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; }
         .instructions { font-size: 0.8em; color: var(--p-dark); text-align: center; max-width: 400px; margin-bottom: 20px; font-weight: bold; }
@@ -18,28 +18,31 @@
         
         .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; gap: 10px; border-bottom: 1px solid rgba(212, 165, 188, 0.2); padding-bottom: 10px; }
         .prod-info { flex: 1.5; }
-        .prod-name { font-size: 1em; font-weight: bold; text-transform: uppercase; }
-        .last-mod { font-size: 0.7em; color: #ffc1e3; margin-top: 4px; }
+        .prod-name { font-size: 0.95em; font-weight: bold; text-transform: uppercase; }
+        .last-mod { font-size: 0.65em; color: #ffc1e3; margin-top: 4px; }
         
         .qty-box { background: var(--p-light); color: var(--p-dark); min-width: 50px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; }
         input[type="number"] { width: 65px; padding: 8px; border-radius: 8px; border: none; text-align: center; font-weight: bold; }
         
-        /* BOTÓN GUARDAR TODO AL FINAL */
+        /* BOTÓN GUARDAR TODO EN GAMA ROSA */
         .btn-save-all { 
-            background: #2ecc71; 
+            background: var(--p-accent); 
             color: white; 
-            border: none; 
+            border: 2px solid var(--p-light); 
             padding: 18px; 
             border-radius: 12px; 
             cursor: pointer; 
             font-weight: bold; 
-            font-size: 1.2em; 
+            font-size: 1.1em; 
             width: 95%; 
             max-width: 550px; 
             margin-bottom: 40px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+        .btn-save-all:hover { background: #b06a8f; }
         .btn-save-all:active { transform: scale(0.98); }
 
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: var(--p-dark); font-weight: bold; }
@@ -50,7 +53,7 @@
     <div id="loading-overlay">Procesando...</div>
 
     <h1>Inventario</h1>
-    <p class="instructions">RELLENA LAS CANTIDADES DE LOS PRODUCTOS QUE TENGAS Y DALE A GUARDAR AL FINAL</p>
+    <p class="instructions">RELLENA LAS CANTIDADES Y DALE A GUARDAR AL FINAL</p>
 
     <div class="user-box">
         USUARIO: 
@@ -70,13 +73,12 @@
         <div id="listContainer"></div>
     </div>
 
-    <button id="btnSave" class="btn-save-all" onclick="saveAllChanges()">💾 GUARDAR TODO</button>
+    <button id="btnSave" class="btn-save-all" onclick="saveAllChanges()">💾 Guardar Todo</button>
 
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwsO41veRFVbzPLycyBRC17lynjy_DzEwzyusDr2UWQvryFCn7ISwRg6HmIBLvkUqTHsA/exec'; 
         let inventoryData = [];
 
-        // Diccionario de Emojis para que se vea más lindo
         const emojis = {
             "carne de venado": "🦌", "losa de carne": "🥩", "jamon": "🍖", "bolonias": "🥪",
             "aguas carbonatadas": "🥤", "naranja": "🍊", "piña": "🍍", "fresa": "🍓", "manzana": "🍎"
@@ -106,7 +108,6 @@
                 const nameLower = row[0].toLowerCase().trim();
                 const emoji = emojis[nameLower] || "📦";
                 
-                // Formato de hora amigable
                 let dateStr = row[colIdx+1] || '---';
                 if(dateStr.includes('T') || !isNaN(Date.parse(dateStr))) {
                     const d = new Date(dateStr);
@@ -140,11 +141,10 @@
                 }
             });
 
-            if (updates.length === 0) return alert("No has ingresado ninguna cantidad para guardar.");
+            if (updates.length === 0) return alert("No hay cambios para guardar.");
 
-            showLoading("Guardando todos los cambios en el Excel...");
+            showLoading("Guardando en el Excel...");
             
-            // Enviamos cada cambio
             for (let up of updates) {
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
@@ -153,7 +153,6 @@
                 });
             }
 
-            // Un pequeño retraso para que Google Sheets procese y recargamos
             setTimeout(() => { location.reload(); }, 800);
         }
 
