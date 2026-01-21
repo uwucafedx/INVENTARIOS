@@ -9,7 +9,6 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; }
         h1 { color: var(--p-dark); letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; margin-bottom: 5px; }
         
-        /* ESTILO DE LA NOTA DE RECORDATORIO */
         .nota-informativa {
             background: #fff0f6;
             color: #8e5d74;
@@ -21,7 +20,6 @@
             max-width: 500px;
             margin-bottom: 20px;
             line-height: 1.4;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
         }
 
         .user-box { margin-bottom: 20px; font-weight: bold; color: var(--p-dark); }
@@ -50,14 +48,8 @@
             width: 95%; 
             max-width: 550px; 
             margin-bottom: 40px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: 0.3s;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
-        .btn-save-all:hover { background: #b06a8f; }
-        .btn-save-all:active { transform: scale(0.98); }
-
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: var(--p-dark); font-weight: bold; }
     </style>
 </head>
@@ -126,9 +118,21 @@
                 const emoji = emojis[nameLower] || "📦";
                 
                 let dateStr = row[colIdx+1] || '---';
-                if(dateStr.includes('T') || !isNaN(Date.parse(dateStr))) {
-                    const d = new Date(dateStr);
-                    dateStr = d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                // --- CORRECCIÓN DE HORA PARA ARGENTINA ---
+                if(dateStr !== '---') {
+                    const fechaObj = new Date(dateStr);
+                    if (!isNaN(fechaObj.getTime())) {
+                        dateStr = fechaObj.toLocaleString('es-AR', {
+                            timeZone: 'America/Argentina/Buenos_Aires',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                    }
                 }
 
                 container.innerHTML += `
