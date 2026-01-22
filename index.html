@@ -1,4 +1,4 @@
- d<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -85,7 +85,7 @@
     <h1>Inventario</h1>
     
     <div class="nota-informativa">
-        📢 <b>Uso:</b> Selecciona <b>+</b> para agregar o <b>-</b> para retirar stock.
+        📢 <b>Uso:</b> Selecciona <b>+</b> para agregar o <b>-</b> para retirar stock. Si tocas el botón cambia de + a -
     </div>
 
     <div class="user-box">
@@ -120,14 +120,14 @@
         const excludeFromMain = [
             "Medallones de Carne", "Jamón rebanado", "Lomo de ternera", 
             "Solomillo de Res", "Masa", "jugo de fresa", 
-            "jugo de naranja", "jugo de piña", "jugo de manzana"
+            "jugo de naranja", "jugo de piña", "jugo de manzana", "Nota"
         ];
 
         const emojis = {
             "carne de venado": "🦌", "losa de carne": "🥩", "jamon": "🍖", "bolonias": "🥪",
             "aguas carbonatadas": "🥤", "naranja": "🍊", "piña": "🍍", "fresa": "🍓", "manzana": "🍎",
             "medallones de carne": "🍔", "jamón rebanado": "🍖", "lomo de ternera": "🥩", 
-            "solomillo de res": "🥩", "masa": "🍝", "jugo de manzana": "🍎", 
+            "solomillo de res": "🥩", "masa": "🍜", "jugo de manzana": "🍎", 
             "jugo de piña": "🍍", "jugo de fresa": "🍓", "jugo de naranja": "🍊"
         };
 
@@ -142,24 +142,29 @@
         }
 
         function timeSince(dateString) {
-            if (!dateString || dateString === "-" || dateString.trim() === "") return "Sin registros";
+            if (!dateString || dateString === "-" || dateString.trim() === "" || dateString === "NaN") return "Sin registros";
             
-            // Procesa el formato 21/1/2026, 18:57:55
-            const parts = dateString.split(/[/, :]/);
-            const date = new Date(parts[2], parts[1]-1, parts[0], parts[3], parts[4], parts[5]);
-            
-            const seconds = Math.floor((new Date() - date) / 1000);
-            
-            if (seconds < 60) return "Hace segundos";
-            
-            const minutes = Math.floor(seconds / 60);
-            if (minutes < 60) return `Hace ${minutes} min`;
-            
-            const hours = Math.floor(minutes / 60);
-            if (hours < 24) return `Hace ${hours} h`;
-            
-            const days = Math.floor(hours / 24);
-            return `Hace ${days} d`;
+            try {
+                const parts = dateString.split(/[/, :]/);
+                if (parts.length < 3) return "Sin registros";
+                
+                const date = new Date(parts[2], parts[1]-1, parts[0], parts[3]||0, parts[4]||0, parts[5]||0);
+                const seconds = Math.floor((new Date() - date) / 1000);
+                
+                if (isNaN(seconds)) return "Sin registros";
+                if (seconds < 60) return "Hace segundos";
+                
+                const minutes = Math.floor(seconds / 60);
+                if (minutes < 60) return `Hace ${minutes} min`;
+                
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return `Hace ${hours} h`;
+                
+                const days = Math.floor(hours / 24);
+                return `Hace ${days} d`;
+            } catch (e) {
+                return "Sin registros";
+            }
         }
 
         function updateUserUI() {
@@ -192,13 +197,11 @@
             const dateIdx = colIdx + 1;
             
             inventoryData.forEach((row, i) => {
-                if (i < 2 || !row[0] || row[0].toLowerCase() === "producto") return;
+                if (i < 2 || !row[0] || row[0].toLowerCase() === "producto" || row[0].toLowerCase() === "nota") return;
                 const prodClean = row[0].trim();
                 const html = createRowHtml(row[0], row[colIdx], row[dateIdx], colIdx, color);
                 
-                if (excludeFromMain.some(item => item.toLowerCase() === prodClean.toLowerCase())) {
-                    // No hacer nada aquí
-                } else {
+                if (!excludeFromMain.some(item => item.toLowerCase() === prodClean.toLowerCase())) {
                     container.innerHTML += html;
                 }
             });
@@ -229,13 +232,12 @@
                 </div>`;
         }
 
-        // Función para actualizar los textos de tiempo sin recargar todo
         setInterval(() => {
             document.querySelectorAll('.mod-time').forEach(el => {
                 const date = el.getAttribute('data-date');
                 if (date) el.innerText = "Modificado: " + timeSince(date);
             });
-        }, 30000); // Se actualiza cada 30 segundos
+        }, 30000);
 
         async function saveAllChanges() {
             const inputs = document.querySelectorAll('.qty-input');
