@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ d<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -15,20 +15,14 @@
             font-family: 'Segoe UI', sans-serif; 
             background: #000 url('Dise%C3%B1o%20sin%20t%C3%ADtulo%20(12).png') no-repeat center center fixed; 
             background-size: cover;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding: 10px; 
-            margin: 0; 
-            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; min-height: 100vh;
         }
 
         h1 { color: #ffffff; letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; text-shadow: 2px 2px 10px var(--p-violet); }
         
         .nota-informativa {
             background: rgba(245, 230, 255, 0.9);
-            color: #5a2d6d;
-            border: 2px dashed var(--p-violet);
+            color: #5a2d6d; border: 2px dashed var(--p-violet);
             padding: 15px; border-radius: 15px; font-size: 0.85em; text-align: center; max-width: 500px; margin-bottom: 25px;
         }
 
@@ -53,17 +47,28 @@
         }
 
         .header-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; border-bottom: 2px solid var(--p-violet); padding-bottom: 10px; }
-        .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; gap: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 10px; }
-        .prod-info { flex: 1.5; }
-        .prod-name { font-size: 0.95em; font-weight: bold; text-transform: uppercase; }
-        .mod-time { font-size: 0.7em; font-style: italic; margin-top: 2px; filter: brightness(1.2); }
+        .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; gap: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 10px; }
+        
+        .prod-info { flex: 1.2; min-width: 0; }
+        .prod-name { font-size: 0.9em; font-weight: bold; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mod-time { font-size: 0.7em; font-style: italic; margin-top: 2px; }
         
         .qty-box { 
-            min-width: 55px; height: 35px; display: flex; align-items: center; justify-content: center; 
-            border-radius: 8px; font-weight: bold; color: white;
+            min-width: 45px; height: 35px; display: flex; align-items: center; justify-content: center; 
+            border-radius: 8px; font-weight: bold; color: white; font-size: 0.9em;
         }
         
-        input[type="number"] { padding: 8px; border-radius: 8px; border: none; font-weight: bold; width: 65px; text-align: center; }
+        .input-group { display: flex; align-items: center; gap: 4px; }
+
+        .sign-btn {
+            width: 35px; height: 35px; border: none; border-radius: 8px; color: white;
+            font-weight: bold; font-size: 1.2em; cursor: pointer; transition: 0.2s;
+        }
+
+        input[type="number"] { 
+            padding: 8px; border-radius: 8px; border: none; font-weight: bold; 
+            width: 50px; text-align: center; font-size: 1em;
+        }
         
         .btn-save-all { 
             color: white; border: none; padding: 18px; border-radius: 15px; cursor: pointer; 
@@ -80,7 +85,7 @@
     <h1>Inventario</h1>
     
     <div class="nota-informativa">
-        📢 <b>Recordatorio:</b> Negativo (-) retira, Positivo (+) agrega.
+        📢 <b>Uso:</b> Selecciona <b>+</b> para agregar o <b>-</b> para retirar stock.
     </div>
 
     <div class="user-box">
@@ -101,7 +106,7 @@
         
         <div id="listContainer"></div>
 
-        <div class="section-title">✨ Cortes Especiales y Otros</div>
+        <div class="section-title">✨ Cortes Especiales y OTROS</div>
         <div id="extraContainer"></div>
     </div>
 
@@ -110,7 +115,6 @@
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwsO41veRFVbzPLycyBRC17lynjy_DzEwzyusDr2UWQvryFCn7ISwRg6HmIBLvkUqTHsA/exec'; 
         let inventoryData = [];
-
         const userColors = { "GIULY": "#b4849f", "ALEX": "#a7a7df", "NASHIRA": "#6e4792" };
 
         const excludeFromMain = [
@@ -127,23 +131,35 @@
             "jugo de piña": "🍍", "jugo de fresa": "🍓", "jugo de naranja": "🍊"
         };
 
+        function toggleSign(btn) {
+            if (btn.innerText === "+") {
+                btn.innerText = "-";
+                btn.style.filter = "brightness(0.7)";
+            } else {
+                btn.innerText = "+";
+                btn.style.filter = "brightness(1.2)";
+            }
+        }
+
         function timeSince(dateString) {
-            if (!dateString || dateString === "-") return "Sin registros";
+            if (!dateString || dateString === "-" || dateString.trim() === "") return "Sin registros";
+            
+            // Procesa el formato 21/1/2026, 18:57:55
             const parts = dateString.split(/[/, :]/);
             const date = new Date(parts[2], parts[1]-1, parts[0], parts[3], parts[4], parts[5]);
+            
             const seconds = Math.floor((new Date() - date) / 1000);
             
-            let interval = seconds / 31536000;
-            if (interval > 1) return "Hace " + Math.floor(interval) + " años";
-            interval = seconds / 2592000;
-            if (interval > 1) return "Hace " + Math.floor(interval) + " meses";
-            interval = seconds / 86400;
-            if (interval > 1) return "Hace " + Math.floor(interval) + " días";
-            interval = seconds / 3600;
-            if (interval > 1) return "Hace " + Math.floor(interval) + " h";
-            interval = seconds / 60;
-            if (interval > 1) return "Hace " + Math.floor(interval) + " min";
-            return "Hace segundos";
+            if (seconds < 60) return "Hace segundos";
+            
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `Hace ${minutes} min`;
+            
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `Hace ${hours} h`;
+            
+            const days = Math.floor(hours / 24);
+            return `Hace ${days} d`;
         }
 
         function updateUserUI() {
@@ -175,14 +191,17 @@
             const colIdx = (user === "GIULY") ? 1 : (user === "ALEX") ? 3 : 5;
             const dateIdx = colIdx + 1;
             
-            for (let i = 2; i < inventoryData.length; i++) {
-                const row = inventoryData[i];
-                if (!row[0] || row[0].toLowerCase() === "producto") continue;
+            inventoryData.forEach((row, i) => {
+                if (i < 2 || !row[0] || row[0].toLowerCase() === "producto") return;
                 const prodClean = row[0].trim();
-                if (excludeFromMain.some(item => item.toLowerCase() === prodClean.toLowerCase())) continue;
-
-                container.innerHTML += createRowHtml(row[0], row[colIdx], row[dateIdx], colIdx, color);
-            }
+                const html = createRowHtml(row[0], row[colIdx], row[dateIdx], colIdx, color);
+                
+                if (excludeFromMain.some(item => item.toLowerCase() === prodClean.toLowerCase())) {
+                    // No hacer nada aquí
+                } else {
+                    container.innerHTML += html;
+                }
+            });
 
             const bottomList = ["Medallones de Carne", "Jamón rebanado", "Lomo de ternera", "Solomillo de Res", "Masa", "jugo de fresa", "jugo de naranja", "jugo de piña", "jugo de manzana"];
             bottomList.forEach(prodName => {
@@ -200,12 +219,23 @@
                 <div class="row">
                     <div class="prod-info">
                         <div class="prod-name">${emoji} ${name}</div>
-                        <div class="mod-time" style="color: ${color}">Modificado: ${timeStr}</div>
+                        <div class="mod-time" style="color: ${color}" data-date="${date}">Modificado: ${timeStr}</div>
                     </div>
                     <div class="qty-box" style="background-color: ${color}">${stock || 0}</div>
-                    <input type="number" class="qty-input" data-prod="${name}" data-col="${col}" placeholder="0" style="border: 2px solid ${color}">
+                    <div class="input-group">
+                        <button class="sign-btn" style="background-color: ${color}" onclick="toggleSign(this)">+</button>
+                        <input type="number" class="qty-input" data-prod="${name}" data-col="${col}" placeholder="0" inputmode="numeric" style="border: 2px solid ${color}">
+                    </div>
                 </div>`;
         }
+
+        // Función para actualizar los textos de tiempo sin recargar todo
+        setInterval(() => {
+            document.querySelectorAll('.mod-time').forEach(el => {
+                const date = el.getAttribute('data-date');
+                if (date) el.innerText = "Modificado: " + timeSince(date);
+            });
+        }, 30000); // Se actualiza cada 30 segundos
 
         async function saveAllChanges() {
             const inputs = document.querySelectorAll('.qty-input');
@@ -214,9 +244,15 @@
             const userCol = (user === "GIULY") ? 1 : (user === "ALEX") ? 3 : 5;
 
             inputs.forEach(input => {
-                const val = parseInt(input.value);
+                let val = parseInt(input.value);
                 const prod = input.getAttribute('data-prod');
-                if (!isNaN(val) && val !== 0) updates.push({ producto: prod, cantidad: val, userCol: userCol });
+                const sign = input.previousElementSibling.innerText;
+                
+                if (!isNaN(val) && val !== 0) {
+                    if (sign === "-") val = -Math.abs(val);
+                    else val = Math.abs(val);
+                    updates.push({ producto: prod, cantidad: val, userCol: userCol });
+                }
             });
 
             if (updates.length === 0) return alert("No hay cambios para guardar.");
