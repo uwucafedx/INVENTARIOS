@@ -27,7 +27,7 @@
 </head>
 <body onload="updateUserUI()">
 
-    <div id="loading-overlay">Cargando datos🐻🌸💀...no te estreses💕</div>
+    <div id="loading-overlay">Cargando datos🐻🌸💀...</div>
 
     <h1>Inventario</h1>
 
@@ -49,7 +49,7 @@
         
         <div id="listContainer"></div>
 
-        <div class="section-title">✨ Cortes Especiales y Otros</div>
+        <div class="section-title">✨ Cortes Especiales y Jugos</div>
         <div id="extraContainer"></div>
     </div>
 
@@ -70,21 +70,28 @@
             "jugo de piña": "🍍", "jugo de fresa": "🍓", "jugo de naranja": "🍊"
         };
 
+        // ESTA ES LA FUNCIÓN QUE CALCULA EL TIEMPO PASADO
         function timeSince(dateString) {
-            if (!dateString || String(dateString).trim().length < 5 || String(dateString).includes("- ")) return "Sin registros";
+            if (!dateString || String(dateString).trim() === "" || String(dateString) === "-" || String(dateString).includes("undefined")) {
+                return "Sin movimientos";
+            }
             
             try {
-                // Extrae todos los números de la cadena (Día, Mes, Año, Hora, Min, Seg)
-                const p = String(dateString).match(/\d+/g);
-                if (!p || p.length < 3) return "Sin registros";
+                const numbers = String(dateString).match(/\d+/g);
+                if (!numbers || numbers.length < 3) return "Sin movimientos";
 
-                // Crear objeto fecha: New Date(año, mes-1, día, hora, min, seg)
-                // Usamos p[2] para año, p[1]-1 para mes, p[0] para día
-                const recordDate = new Date(p[2], p[1]-1, p[0], p[3]||0, p[4]||0, p[5]||0);
-                const diffSec = Math.floor((new Date() - recordDate) / 1000);
+                // p[0]=día, p[1]=mes, p[2]=año, p[3]=hora, p[4]=min, p[5]=seg
+                const day = parseInt(numbers[0]);
+                const month = parseInt(numbers[1]) - 1;
+                let year = parseInt(numbers[2]);
+                if (year < 100) year += 2000;
 
-                if (isNaN(diffSec)) return "Sin registros";
-                if (diffSec < 0) return "Recién ahora";
+                const lastUpdate = new Date(year, month, day, numbers[3]||0, numbers[4]||0, numbers[5]||0);
+                const now = new Date();
+                const diffSec = Math.floor((now - lastUpdate) / 1000);
+
+                if (isNaN(diffSec)) return "Sin movimientos";
+                if (diffSec < 3) return "Recién ahora";
                 if (diffSec < 60) return `Hace ${diffSec} seg`;
                 
                 const diffMin = Math.floor(diffSec / 60);
@@ -95,7 +102,7 @@
                 
                 return `Hace ${Math.floor(diffHrs/24)} d`;
             } catch (e) {
-                return "Sin registros";
+                return "Sin movimientos";
             }
         }
 
@@ -135,8 +142,7 @@
             const dateIdx = colIdx + 1;
             
             inventoryData.forEach((row, i) => {
-                // Filtramos encabezados y la fila de "Nota"
-                if (i < 2 || !row[0] || row[0].toLowerCase() === "producto" || row[0].toLowerCase().includes("nota")) return;
+                if (i < 2 || !row[0] || row[0].toLowerCase().includes("producto") || row[0].toLowerCase().includes("nota")) return;
                 
                 const prodName = row[0].trim();
                 const isExtra = extraItems.some(e => e.toLowerCase() === prodName.toLowerCase());
@@ -163,19 +169,17 @@
                 </div>`;
         }
 
-        // Reloj que actualiza el texto de tiempo cada 2 segundos
+        // SE ACTUALIZA CADA 5 SEGUNDOS PARA QUE VEAS LOS MINUTOS PASAR
         setInterval(() => {
             document.querySelectorAll('.mod-time').forEach(el => {
                 const rawDate = el.getAttribute('data-date');
-                const nuevoTexto = "Modificado: " + timeSince(rawDate);
-                if (el.innerText !== nuevoTexto) el.innerText = nuevoTexto;
+                el.innerText = "Modificado: " + timeSince(rawDate);
             });
-        }, 2000);
+        }, 5000);
 
         async function saveAllChanges() {
             const inputs = document.querySelectorAll('.qty-input');
             let updates = [];
-            if (inputs.length === 0) return;
             const userCol = parseInt(inputs[0].getAttribute('data-col'));
 
             inputs.forEach(input => {
