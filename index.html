@@ -172,20 +172,19 @@
 
         const userColors = { "GIULY": "#b4849f", "ALEX": "#a7a7df", "NASHIRA": "#6e4792" };
 
-        // Estos productos NO aparecen en la lista de arriba
+        // Estos productos NO aparecerán en la lista principal de arriba
         const excludeFromMain = [
-            "Jamón rebanado", "Lomo de ternera", "Solomillo de Res", 
-            "Masa", "Nota", "Jugo de manzana", "Jugo de piña", 
-            "Jugo de fresa", "Jugo de naranja"
+            "Medallones de Carne", "Jamón rebanado", "Lomo de ternera", 
+            "Solomillo de Res", "Masa", "jugo de fresa", 
+            "jugo de naranja", "jugo de piña", "jugo de manzana"
         ];
 
-        // Emojis específicos
         const emojis = {
             "carne de venado": "🦌", "losa de carne": "🥩", "jamon": "🍖", "bolonias": "🥪",
             "aguas carbonatadas": "🥤", "naranja": "🍊", "piña": "🍍", "fresa": "🍓", "manzana": "🍎",
-            "jamón rebanado": "🍖", "lomo de ternera": "🥩", "solomillo de res": "🥩", 
-            "masa": "🍝", "nota": "✏️", "jugo de manzana": "🍎", "jugo de piña": "🍍", 
-            "jugo de fresa": "🍓", "jugo de naranja": "🍊"
+            "medallones de carne": "🍔", "jamón rebanado": "🍖", "lomo de ternera": "🥩", 
+            "solomillo de res": "🥩", "masa": "🍝", "jugo de manzana": "🍎", 
+            "jugo de piña": "🍍", "jugo de fresa": "🍓", "jugo de naranja": "🍊"
         };
 
         function updateUserUI() {
@@ -216,31 +215,29 @@
             extraContainer.innerHTML = '';
             const colIdx = (user === "GIULY") ? 1 : (user === "ALEX") ? 3 : 5;
             
-            // 1. Render Lista Arriba (Sin Nota y sin Especiales)
+            // Renderizar Lista Principal
             for (let i = 2; i < inventoryData.length; i++) {
                 const row = inventoryData[i];
                 if (!row[0] || row[0].toLowerCase() === "producto") continue;
                 
-                const prodClean = row[0].toLowerCase().trim();
-                const isSpecial = excludeFromMain.some(item => item.toLowerCase() === prodClean);
+                const prodClean = row[0].trim();
+                const isSpecial = excludeFromMain.some(item => item.toLowerCase() === prodClean.toLowerCase());
                 
                 if (isSpecial) continue;
 
-                const emoji = emojis[prodClean] || "📦";
+                const emoji = emojis[prodClean.toLowerCase()] || "📦";
                 container.innerHTML += createRowHtml(row[0], row[colIdx], colIdx, color, emoji);
             }
 
-            // 2. Render Lista Abajo (Especiales + Jugos)
-            // Se muestran en el orden de esta lista:
+            // Renderizar Sección de Especiales y Jugos
             const bottomList = [
-                "Jamón rebanado", "Lomo de ternera", "Solomillo de Res", 
-                "Masa", "Jugo de manzana", "Jugo de piña", 
-                "Jugo de fresa", "Jugo de naranja"
+                "Medallones de Carne", "Jamón rebanado", "Lomo de ternera", 
+                "Solomillo de Res", "Masa", "jugo de fresa", 
+                "jugo de naranja", "jugo de piña", "jugo de manzana"
             ];
 
             bottomList.forEach(prodName => {
                 const sheetRow = inventoryData.find(r => r[0] && r[0].toLowerCase().trim() === prodName.toLowerCase().trim());
-                // Solo se dibuja si existe en el Excel
                 if (sheetRow) {
                     const emoji = emojis[prodName.toLowerCase().trim()] || "✨";
                     extraContainer.innerHTML += createRowHtml(sheetRow[0], sheetRow[colIdx], colIdx, color, emoji);
