@@ -3,90 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario UwU</title>
+    <title>Inventario Pro</title>
     <style>
-        :root { 
-            --p-violet: #b35bd6; 
-            --bg-glass: rgba(30, 30, 30, 0.85); 
-            --p-light: #e0b3ff;
-        }
-        
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: #000 url('Dise%C3%B1o%20sin%20t%C3%ADtulo%20(12).png') no-repeat center center fixed; 
-            background-size: cover;
-            display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; min-height: 100vh;
-        }
-
+        :root { --p-violet: #b35bd6; --bg-glass: rgba(30, 30, 30, 0.85); --p-light: #e0b3ff; }
+        body { font-family: 'Segoe UI', sans-serif; background: #000 url('Dise%C3%B1o%20sin%20t%C3%ADtulo%20(12).png') no-repeat center center fixed; background-size: cover; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; min-height: 100vh; }
         h1 { color: #ffffff; letter-spacing: 3px; text-transform: uppercase; margin-top: 20px; text-shadow: 2px 2px 10px var(--p-violet); }
-        
-        .nota-informativa {
-            background: rgba(245, 230, 255, 0.9);
-            color: #5a2d6d; border: 2px dashed var(--p-violet);
-            padding: 15px; border-radius: 15px; font-size: 0.85em; text-align: center; max-width: 500px; margin-bottom: 25px;
-        }
-
-        .user-box { 
-            margin-bottom: 20px; font-weight: bold; color: #fff; background: rgba(40, 40, 40, 0.8); 
-            padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);
-            display: flex; align-items: center; gap: 10px;
-        }
-
+        .user-box { margin-bottom: 20px; font-weight: bold; color: #fff; background: rgba(40, 40, 40, 0.8); padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 10px; }
         select { padding: 10px; border-radius: 8px; border: 2px solid white; font-weight: bold; cursor: pointer; outline: none; }
-
-        .inventory-card { 
-            background: var(--bg-glass); color: white; padding: 20px; border-radius: 20px; width: 95%; 
-            max-width: 550px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 20px; 
-            backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.1); display: none;
-        }
-
-        .section-title {
-            text-align: center; color: var(--p-light); font-weight: bold; text-transform: uppercase;
-            font-size: 0.9em; margin: 25px 0 15px 0; border-top: 1px solid rgba(255,255,255,0.2);
-            padding-top: 15px; letter-spacing: 1px;
-        }
-
+        .inventory-card { background: var(--bg-glass); color: white; padding: 20px; border-radius: 20px; width: 95%; max-width: 550px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 20px; backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.1); display: none; }
+        .section-title { text-align: center; color: var(--p-light); font-weight: bold; text-transform: uppercase; font-size: 0.9em; margin: 25px 0 15px 0; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; letter-spacing: 1px; }
         .header-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; border-bottom: 2px solid var(--p-violet); padding-bottom: 10px; }
         .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; gap: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 10px; }
-        
         .prod-info { flex: 1.2; min-width: 0; }
         .prod-name { font-size: 0.9em; font-weight: bold; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mod-time { font-size: 0.7em; font-style: italic; margin-top: 2px; }
-        
-        .qty-box { 
-            min-width: 45px; height: 35px; display: flex; align-items: center; justify-content: center; 
-            border-radius: 8px; font-weight: bold; color: white; font-size: 0.9em;
-        }
-        
+        .mod-time { font-size: 0.75em; font-style: italic; margin-top: 2px; opacity: 0.9; }
+        .qty-box { min-width: 45px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; color: white; font-size: 0.9em; }
         .input-group { display: flex; align-items: center; gap: 4px; }
-
-        .sign-btn {
-            width: 35px; height: 35px; border: none; border-radius: 8px; color: white;
-            font-weight: bold; font-size: 1.2em; cursor: pointer; transition: 0.2s;
-        }
-
-        input[type="number"] { 
-            padding: 8px; border-radius: 8px; border: none; font-weight: bold; 
-            width: 50px; text-align: center; font-size: 1em;
-        }
-        
-        .btn-save-all { 
-            color: white; border: none; padding: 18px; border-radius: 15px; cursor: pointer; 
-            font-weight: bold; font-size: 1.1em; width: 95%; max-width: 550px; margin-bottom: 40px; text-transform: uppercase;
-        }
-
+        .sign-btn { width: 35px; height: 35px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 1.2em; cursor: pointer; }
+        input[type="number"] { padding: 8px; border-radius: 8px; border: none; font-weight: bold; width: 50px; text-align: center; font-size: 1em; }
+        .btn-save-all { color: white; border: none; padding: 18px; border-radius: 15px; cursor: pointer; font-weight: bold; font-size: 1.1em; width: 95%; max-width: 550px; margin-bottom: 40px; text-transform: uppercase; }
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; font-weight: bold; }
     </style>
 </head>
 <body onload="updateUserUI()">
 
-    <div id="loading-overlay">Cargando datos🐻🌸💀...</div>
+    <div id="loading-overlay">Cargando datos🐻🌸💀...no te estreses💕</div>
 
     <h1>Inventario</h1>
-    
-    <div class="nota-informativa">
-        📢 <b>Uso:</b> Selecciona <b>+</b> para agregar o <b>-</b> para retirar stock. Si tocas el botón cambia de + a -
-    </div>
 
     <div class="user-box">
         USUARIO: 
@@ -106,7 +49,7 @@
         
         <div id="listContainer"></div>
 
-        <div class="section-title">✨ Cortes Especiales y OTROS</div>
+        <div class="section-title">✨ Cortes Especiales y Otros</div>
         <div id="extraContainer"></div>
     </div>
 
@@ -117,10 +60,10 @@
         let inventoryData = [];
         const userColors = { "GIULY": "#b4849f", "ALEX": "#a7a7df", "NASHIRA": "#6e4792" };
 
-        const excludeFromMain = [
+        const extraItems = [
             "Medallones de Carne", "Jamón rebanado", "Lomo de ternera", 
             "Solomillo de Res", "Masa", "jugo de fresa", 
-            "jugo de naranja", "jugo de piña", "jugo de manzana", "Nota"
+            "jugo de naranja", "jugo de piña", "jugo de manzana"
         ];
 
         const emojis = {
@@ -131,40 +74,33 @@
             "jugo de piña": "🍍", "jugo de fresa": "🍓", "jugo de naranja": "🍊"
         };
 
-        function toggleSign(btn) {
-            if (btn.innerText === "+") {
-                btn.innerText = "-";
-                btn.style.filter = "brightness(0.7)";
-            } else {
-                btn.innerText = "+";
-                btn.style.filter = "brightness(1.2)";
-            }
+        function timeSince(dateString) {
+            if (!dateString || dateString.length < 5 || dateString.includes("-")) return "Sin registros";
+            
+            // Limpia cualquier carácter que no sea número o separador común
+            const p = dateString.split(/[^0-9]/).filter(n => n !== "");
+            if (p.length < 3) return "Sin registros";
+
+            // Crea la fecha del registro (Día, Mes-1, Año, Horas, Mins, Segs)
+            const recordDate = new Date(p[2], p[1]-1, p[0], p[3]||0, p[4]||0, p[5]||0);
+            const diffMs = new Date() - recordDate;
+            const diffSec = Math.floor(diffMs / 1000);
+
+            if (isNaN(diffSec) || diffSec < 0) return "Hace unos segundos";
+            if (diffSec < 60) return `Hace ${diffSec} seg`;
+            
+            const diffMin = Math.floor(diffSec / 60);
+            if (diffMin < 60) return `Hace ${diffMin} min`;
+            
+            const diffHrs = Math.floor(diffMin / 60);
+            if (diffHrs < 24) return `Hace ${diffHrs} h`;
+            
+            return `Hace ${Math.floor(diffHrs/24)} d`;
         }
 
-        function timeSince(dateString) {
-            if (!dateString || dateString === "-" || dateString.trim() === "" || dateString === "NaN") return "Sin registros";
-            
-            try {
-                const parts = dateString.split(/[/, :]/);
-                if (parts.length < 3) return "Sin registros";
-                
-                const date = new Date(parts[2], parts[1]-1, parts[0], parts[3]||0, parts[4]||0, parts[5]||0);
-                const seconds = Math.floor((new Date() - date) / 1000);
-                
-                if (isNaN(seconds)) return "Sin registros";
-                if (seconds < 60) return "Hace segundos";
-                
-                const minutes = Math.floor(seconds / 60);
-                if (minutes < 60) return `Hace ${minutes} min`;
-                
-                const hours = Math.floor(minutes / 60);
-                if (hours < 24) return `Hace ${hours} h`;
-                
-                const days = Math.floor(hours / 24);
-                return `Hace ${days} d`;
-            } catch (e) {
-                return "Sin registros";
-            }
+        function toggleSign(btn) {
+            btn.innerText = (btn.innerText === "+") ? "-" : "+";
+            btn.style.filter = (btn.innerText === "-") ? "brightness(0.7)" : "brightness(1.2)";
         }
 
         function updateUserUI() {
@@ -193,36 +129,29 @@
             
             container.innerHTML = '';
             extraContainer.innerHTML = '';
+            
             const colIdx = (user === "GIULY") ? 1 : (user === "ALEX") ? 3 : 5;
             const dateIdx = colIdx + 1;
             
             inventoryData.forEach((row, i) => {
                 if (i < 2 || !row[0] || row[0].toLowerCase() === "producto" || row[0].toLowerCase() === "nota") return;
-                const prodClean = row[0].trim();
-                const html = createRowHtml(row[0], row[colIdx], row[dateIdx], colIdx, color);
                 
-                if (!excludeFromMain.some(item => item.toLowerCase() === prodClean.toLowerCase())) {
-                    container.innerHTML += html;
-                }
-            });
-
-            const bottomList = ["Medallones de Carne", "Jamón rebanado", "Lomo de ternera", "Solomillo de Res", "Masa", "jugo de fresa", "jugo de naranja", "jugo de piña", "jugo de manzana"];
-            bottomList.forEach(prodName => {
-                const sheetRow = inventoryData.find(r => r[0] && r[0].toLowerCase().trim() === prodName.toLowerCase().trim());
-                if (sheetRow) {
-                    extraContainer.innerHTML += createRowHtml(sheetRow[0], sheetRow[colIdx], sheetRow[dateIdx], colIdx, color);
-                }
+                const prodName = row[0].trim();
+                const isExtra = extraItems.some(e => e.toLowerCase() === prodName.toLowerCase());
+                const html = createRowHtml(prodName, row[colIdx], row[dateIdx], colIdx, color);
+                
+                if (isExtra) extraContainer.innerHTML += html;
+                else container.innerHTML += html;
             });
         }
 
         function createRowHtml(name, stock, date, col, color) {
             const emoji = emojis[name.toLowerCase().trim()] || "📦";
-            const timeStr = timeSince(date);
             return `
                 <div class="row">
                     <div class="prod-info">
                         <div class="prod-name">${emoji} ${name}</div>
-                        <div class="mod-time" style="color: ${color}" data-date="${date}">Modificado: ${timeStr}</div>
+                        <div class="mod-time" style="color: ${color}" data-date="${date}">Modificado: ${timeSince(date)}</div>
                     </div>
                     <div class="qty-box" style="background-color: ${color}">${stock || 0}</div>
                     <div class="input-group">
@@ -232,32 +161,29 @@
                 </div>`;
         }
 
+        // Refresca los textos de tiempo cada 10 segundos
         setInterval(() => {
             document.querySelectorAll('.mod-time').forEach(el => {
-                const date = el.getAttribute('data-date');
-                if (date) el.innerText = "Modificado: " + timeSince(date);
+                const rawDate = el.getAttribute('data-date');
+                el.innerText = "Modificado: " + timeSince(rawDate);
             });
-        }, 30000);
+        }, 10000);
 
         async function saveAllChanges() {
             const inputs = document.querySelectorAll('.qty-input');
             let updates = [];
-            const user = document.getElementById('userSelect').value;
-            const userCol = (user === "GIULY") ? 1 : (user === "ALEX") ? 3 : 5;
+            const userCol = parseInt(inputs[0].getAttribute('data-col'));
 
             inputs.forEach(input => {
                 let val = parseInt(input.value);
-                const prod = input.getAttribute('data-prod');
-                const sign = input.previousElementSibling.innerText;
-                
                 if (!isNaN(val) && val !== 0) {
+                    const sign = input.previousElementSibling.innerText;
                     if (sign === "-") val = -Math.abs(val);
-                    else val = Math.abs(val);
-                    updates.push({ producto: prod, cantidad: val, userCol: userCol });
+                    updates.push({ producto: input.getAttribute('data-prod'), cantidad: val, userCol: userCol });
                 }
             });
 
-            if (updates.length === 0) return alert("No hay cambios para guardar.");
+            if (updates.length === 0) return alert("No hay cambios.");
             
             document.getElementById('loading-overlay').style.display = 'flex';
             document.getElementById('loading-overlay').innerText = "Guardando...";
