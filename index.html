@@ -27,7 +27,7 @@
 </head>
 <body onload="updateUserUI()">
 
-    <div id="loading-overlay">Cargando datos🐻🌸💀...No te estreses👍🏻</div>
+    <div id="loading-overlay">Cargando datos 🐻🌸💀...</div>
 
     <h1>Inventario</h1>
 
@@ -46,10 +46,8 @@
             <span>STOCK</span>
             <span>CARGAR</span>
         </div>
-        
         <div id="listContainer"></div>
-
-        <div class="section-title">✨ Cortes Especiales y Otros</div>
+        <div class="section-title">✨ Cortes Especiales y OTROS</div>
         <div id="extraContainer"></div>
     </div>
 
@@ -60,7 +58,7 @@
         let inventoryData = [];
         const userColors = { "GIULY": "#b4849f", "ALEX": "#a7a7df", "NASHIRA": "#6e4792" };
 
-        const extraItems = ["Medallones de Carne", "Jamón rebanado", "Lomo de ternera", "Solomillo de Res", "Masa", "jugo de fresa", "jugo de naranja", "jugo de piña", "jugo de manzana"];
+        const extraItems = ["medallones de carne", "jamón rebanado", "lomo de ternera", "solomillo de res", "masa", "jugo de fresa", "jugo de naranja", "jugo de piña", "jugo de manzana"];
 
         const emojis = {
             "carne de venado": "🦌", "losa de carne": "🥩", "jamon": "🍖", "bolonias": "🥪",
@@ -70,39 +68,29 @@
             "jugo de piña": "🍍", "jugo de fresa": "🍓", "jugo de naranja": "🍊"
         };
 
-        // ESTA ES LA FUNCIÓN QUE CALCULA EL TIEMPO PASADO
-        function timeSince(dateString) {
-            if (!dateString || String(dateString).trim() === "" || String(dateString) === "-" || String(dateString).includes("undefined")) {
-                return "Sin movimientos";
-            }
+        // FUNCIÓN MEJORADA: Usa la lógica que sí te funcionaba en el código viejo
+        function timeSince(dateStr) {
+            if (!dateStr || dateStr === '---' || dateStr === '-' || dateStr === 'undefined') return 'Sin registros';
             
             try {
-                const numbers = String(dateString).match(/\d+/g);
-                if (!numbers || numbers.length < 3) return "Sin movimientos";
-
-                // p[0]=día, p[1]=mes, p[2]=año, p[3]=hora, p[4]=min, p[5]=seg
-                const day = parseInt(numbers[0]);
-                const month = parseInt(numbers[1]) - 1;
-                let year = parseInt(numbers[2]);
-                if (year < 100) year += 2000;
-
-                const lastUpdate = new Date(year, month, day, numbers[3]||0, numbers[4]||0, numbers[5]||0);
-                const now = new Date();
-                const diffSec = Math.floor((now - lastUpdate) / 1000);
-
-                if (isNaN(diffSec)) return "Sin movimientos";
-                if (diffSec < 3) return "Recién ahora";
-                if (diffSec < 60) return `Hace ${diffSec} seg`;
+                // Limpiamos la fecha por si viene con formatos extraños
+                let cleanDate = String(dateStr).replace('T', ' ').replace('Z', '').split('.')[0];
+                const dateObj = new Date(cleanDate);
                 
-                const diffMin = Math.floor(diffSec / 60);
-                if (diffMin < 60) return `Hace ${diffMin} min`;
+                if (isNaN(dateObj.getTime())) return 'Sin registros';
                 
-                const diffHrs = Math.floor(diffMin / 60);
+                const diffInMs = new Date() - dateObj;
+                const diffInMins = Math.floor(diffInMs / 60000);
+                
+                if (diffInMins < 1) return 'Recién ahora';
+                if (diffInMins < 60) return `Hace ${diffInMins} min`;
+                
+                const diffHrs = Math.floor(diffInMins / 60);
                 if (diffHrs < 24) return `Hace ${diffHrs} h`;
                 
-                return `Hace ${Math.floor(diffHrs/24)} d`;
+                return `Hace ${Math.floor(diffHrs / 24)} d`;
             } catch (e) {
-                return "Sin movimientos";
+                return 'Sin registros';
             }
         }
 
@@ -142,40 +130,38 @@
             const dateIdx = colIdx + 1;
             
             inventoryData.forEach((row, i) => {
+                // Filtro para Notas y encabezados [cite: 2026-01-22]
                 if (i < 2 || !row[0] || row[0].toLowerCase().includes("producto") || row[0].toLowerCase().includes("nota")) return;
                 
                 const prodName = row[0].trim();
                 const isExtra = extraItems.some(e => e.toLowerCase() === prodName.toLowerCase());
-                const html = createRowHtml(prodName, row[colIdx], row[dateIdx], colIdx, color);
+                const emoji = emojis[prodName.toLowerCase()] || "📦";
+
+                const html = `
+                    <div class="row">
+                        <div class="prod-info">
+                            <div class="prod-name">${emoji} ${prodName}</div>
+                            <div class="mod-time" style="color: ${color}" data-date="${row[dateIdx]}">Modificado: ${timeSince(row[dateIdx])}</div>
+                        </div>
+                        <div class="qty-box" style="background-color: ${color}">${row[colIdx] || 0}</div>
+                        <div class="input-group">
+                            <button class="sign-btn" style="background-color: ${color}" onclick="toggleSign(this)">+</button>
+                            <input type="number" class="qty-input" data-prod="${prodName}" data-col="${colIdx}" placeholder="0" inputmode="numeric" style="border: 2px solid ${color}">
+                        </div>
+                    </div>`;
                 
                 if (isExtra) extraContainer.innerHTML += html;
                 else container.innerHTML += html;
             });
         }
 
-        function createRowHtml(name, stock, date, col, color) {
-            const emoji = emojis[name.toLowerCase().trim()] || "📦";
-            return `
-                <div class="row">
-                    <div class="prod-info">
-                        <div class="prod-name">${emoji} ${name}</div>
-                        <div class="mod-time" style="color: ${color}" data-date="${date}">Modificado: ${timeSince(date)}</div>
-                    </div>
-                    <div class="qty-box" style="background-color: ${color}">${stock || 0}</div>
-                    <div class="input-group">
-                        <button class="sign-btn" style="background-color: ${color}" onclick="toggleSign(this)">+</button>
-                        <input type="number" class="qty-input" data-prod="${name}" data-col="${col}" placeholder="0" inputmode="numeric" style="border: 2px solid ${color}">
-                    </div>
-                </div>`;
-        }
-
-        // SE ACTUALIZA CADA 5 SEGUNDOS PARA QUE VEAS LOS MINUTOS PASAR
+        // Actualización automática cada 10 segundos
         setInterval(() => {
             document.querySelectorAll('.mod-time').forEach(el => {
                 const rawDate = el.getAttribute('data-date');
                 el.innerText = "Modificado: " + timeSince(rawDate);
             });
-        }, 5000);
+        }, 10000);
 
         async function saveAllChanges() {
             const inputs = document.querySelectorAll('.qty-input');
@@ -192,7 +178,6 @@
             });
 
             if (updates.length === 0) return alert("No hay cambios.");
-            
             document.getElementById('loading-overlay').style.display = 'flex';
             document.getElementById('loading-overlay').innerText = "Guardando...";
             
