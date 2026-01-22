@@ -6,52 +6,54 @@
     <title>Inventario Pro</title>
     <style>
         :root { --p-violet: #b35bd6; --bg-glass: rgba(30, 30, 30, 0.85); --p-light: #e0b3ff; --error-red: #ff3333; --vacio-blue: #3399ff; }
-        body { font-family: 'Segoe UI', sans-serif; background: #000 url('Dise%C3%B1o%20sin%20t%C3%ADtulo%20(12).png') no-repeat center center fixed; background-size: cover; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; min-height: 100vh; }
+        body { font-family: 'Segoe UI', sans-serif; background: #000 url('Dise%C3%B1o%20sin%20t%C3%ADtulo%20(12).png') no-repeat center center fixed; background-size: cover; display: flex; flex-direction: column; align-items: center; padding: 5px; margin: 0; min-height: 100vh; }
         
-        .top-container { display: flex; width: 95%; max-width: 800px; justify-content: space-between; align-items: flex-start; margin-top: 20px; position: relative; }
-        h1 { color: #ffffff; letter-spacing: 3px; text-transform: uppercase; text-shadow: 2px 2px 10px var(--p-violet); margin: 0; flex: 1; text-align: center; }
+        /* AJUSTE PARA ELIMINAR ESPACIO SUPERIOR */
+        .top-container { display: flex; width: 95%; max-width: 800px; justify-content: space-between; align-items: center; margin-top: 5px; position: relative; }
+        h1 { color: #ffffff; letter-spacing: 2px; text-transform: uppercase; text-shadow: 2px 2px 10px var(--p-violet); margin: 0; flex: 1; text-align: left; font-size: 1.5em; }
 
         .notes-section { 
-            width: 150px; height: 150px; 
+            width: 130px; height: 130px; 
             background: url('nota1.png') no-repeat center; 
             background-size: contain; 
             display: flex; justify-content: center; align-items: center;
-            position: absolute; right: 0; top: -10px;
         }
         .note-area {
             width: 80%; height: 60%; background: transparent; border: none; 
-            color: #4a3728; font-family: 'Segoe UI', sans-serif; font-size: 0.85em; 
+            color: #4a3728; font-family: 'Segoe UI', sans-serif; font-size: 0.8em; 
             outline: none; resize: none; text-align: center; font-weight: bold;
         }
 
-        .user-box { margin: 20px 0; font-weight: bold; color: #fff; background: rgba(40, 40, 40, 0.8); padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); }
-        select { padding: 8px; border-radius: 8px; border: 2px solid white; font-weight: bold; }
+        /* BOTÓN DE GUARDADO SUPERIOR PEQUEÑO */
+        .btn-save-mini { background: var(--p-violet); color: white; border: none; padding: 8px 15px; border-radius: 10px; cursor: pointer; font-size: 1.2em; margin: 10px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-        .inventory-card { background: var(--bg-glass); color: white; padding: 20px; border-radius: 20px; width: 95%; max-width: 550px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: none; backdrop-filter: blur(4px); }
-        .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 8px; }
+        .user-box { margin: 10px 0; font-weight: bold; color: #fff; background: rgba(40, 40, 40, 0.8); padding: 8px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); }
+        select { padding: 5px; border-radius: 8px; border: 2px solid white; font-weight: bold; }
+
+        .inventory-card { background: var(--bg-glass); color: white; padding: 15px; border-radius: 20px; width: 95%; max-width: 550px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: none; backdrop-filter: blur(4px); }
+        .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
         .prod-info { flex: 1; }
-        .prod-name { font-size: 0.85em; font-weight: bold; text-transform: uppercase; }
-        .mod-time { font-size: 0.7em; font-style: italic; opacity: 0.8; }
-        .qty-box { min-width: 40px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: bold; font-size: 0.85em; margin-right: 5px; }
+        .prod-name { font-size: 0.8em; font-weight: bold; text-transform: uppercase; }
+        .mod-time { font-size: 0.65em; font-style: italic; opacity: 0.8; }
+        .qty-box { min-width: 35px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: bold; font-size: 0.8em; margin-right: 5px; }
 
         .input-group { display: flex; align-items: center; gap: 4px; }
-        .sign-btn { width: 32px; height: 32px; border: none; border-radius: 6px; color: white; font-weight: bold; font-size: 1.2em; cursor: pointer; }
+        .sign-btn { width: 30px; height: 30px; border: none; border-radius: 6px; color: white; font-weight: bold; font-size: 1.1em; cursor: pointer; }
+        .vacio-btn { background: var(--vacio-blue); color: white; border: none; padding: 5px 8px; border-radius: 6px; font-size: 0.65em; font-weight: bold; cursor: pointer; }
+
+        input[type="number"] { padding: 5px; border-radius: 6px; border: none; width: 40px; text-align: center; font-weight: bold; }
+
+        .section-title { text-align: center; color: var(--p-light); font-weight: bold; font-size: 0.75em; margin: 15px 0 8px 0; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; }
         
-        /* BOTÓN VACIO ACTUALIZADO */
-        .vacio-btn { background: var(--vacio-blue); color: white; border: none; padding: 6px 10px; border-radius: 8px; font-size: 0.7em; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        .vacio-btn:active { transform: scale(0.9); }
-
-        input[type="number"] { padding: 6px; border-radius: 6px; border: none; width: 45px; text-align: center; font-weight: bold; }
-
-        .section-title { text-align: center; color: var(--p-light); font-weight: bold; font-size: 0.8em; margin: 20px 0 10px 0; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
-        .btn-save-all { color: white; border: none; padding: 15px; border-radius: 15px; cursor: pointer; font-size: 1.8em; width: 95%; max-width: 550px; margin: 20px 0 40px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        /* BOTÓN DE GUARDADO INFERIOR ORIGINAL */
+        .btn-save-full { color: white; border: none; padding: 12px; border-radius: 15px; cursor: pointer; font-size: 1.5em; width: 95%; max-width: 550px; margin: 20px 0 40px 0; font-weight: bold; }
         
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; color: white; font-weight: bold; }
     </style>
 </head>
 <body onload="updateUserUI()">
 
-    <div id="loading-overlay">Cargando 🐻🌸💀...</div>
+    <div id="loading-overlay">Subiendo tus datos a la estratósfera...</div>
 
     <div class="top-container">
         <h1>Inventario</h1>
@@ -59,6 +61,8 @@
             <textarea id="notaGeneral" class="note-area" placeholder="Notas..."></textarea>
         </div>
     </div>
+
+    <button id="btnSaveTop" class="btn-save-mini" onclick="saveAllChanges()">💾</button>
 
     <div class="user-box">
         USUARIO: 
@@ -75,7 +79,7 @@
         <div id="extraContainer"></div>
     </div>
 
-    <button id="btnSave" class="btn-save-all" onclick="saveAllChanges()">💾</button>
+    <button id="btnSaveBottom" class="btn-save-full" onclick="saveAllChanges()">💾 GUARDAR CAMBIOS FINAL</button>
 
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwsO41veRFVbzPLycyBRC17lynjy_DzEwzyusDr2UWQvryFCn7ISwRg6HmIBLvkUqTHsA/exec'; 
@@ -121,7 +125,8 @@
             const user = document.getElementById('userSelect').value;
             const color = userColors[user];
             document.getElementById('userSelect').style.backgroundColor = color;
-            document.getElementById('btnSave').style.backgroundColor = color;
+            document.getElementById('btnSaveTop').style.backgroundColor = color;
+            document.getElementById('btnSaveBottom').style.backgroundColor = color;
             renderInventory();
         }
 
