@@ -105,15 +105,14 @@
             color: white;
         }
         
-        input[type="number"], input[type="text"] { 
+        input[type="number"] { 
             padding: 8px; 
             border-radius: 8px; 
             border: none; 
             font-weight: bold; 
+            width: 65px; 
+            text-align: center;
         }
-
-        input[type="number"] { width: 65px; text-align: center; }
-        .input-extra { width: 100%; margin: 8px 0; background: rgba(255,255,255,0.9); color: #333; }
         
         .btn-save-all { 
             background: var(--p-violet); 
@@ -135,7 +134,7 @@
 </head>
 <body onload="updateUserUI()">
 
-    <div id="loading-overlay">Cargando inventario...</div>
+    <div id="loading-overlay">Cargando datos...</div>
 
     <h1>Inventario</h1>
     
@@ -161,7 +160,7 @@
         
         <div id="listContainer"></div>
 
-        <div class="section-title">✨ Cortes Especiales y Otros</div>
+        <div class="section-title">✨ Cortes Especiales y Jugos</div>
         <div id="extraContainer"></div>
     </div>
 
@@ -173,12 +172,20 @@
 
         const userColors = { "GIULY": "#b4849f", "ALEX": "#a7a7df", "NASHIRA": "#6e4792" };
 
-        const excludeFromMain = ["Jamón rebanado", "Lomo de ternera", "Solomillo de Res", "Masa", "Nota"];
+        // Estos productos NO aparecen en la lista de arriba
+        const excludeFromMain = [
+            "Jamón rebanado", "Lomo de ternera", "Solomillo de Res", 
+            "Masa", "Nota", "Jugo de manzana", "Jugo de piña", 
+            "Jugo de fresa", "Jugo de naranja"
+        ];
 
+        // Emojis específicos
         const emojis = {
             "carne de venado": "🦌", "losa de carne": "🥩", "jamon": "🍖", "bolonias": "🥪",
             "aguas carbonatadas": "🥤", "naranja": "🍊", "piña": "🍍", "fresa": "🍓", "manzana": "🍎",
-            "jamón rebanado": "🥪", "lomo de ternera": "🍖", "solomillo de res": "🥩", "masa": "🍝", "nota": "✏️"
+            "jamón rebanado": "🍖", "lomo de ternera": "🥩", "solomillo de res": "🥩", 
+            "masa": "🍝", "nota": "✏️", "jugo de manzana": "🍎", "jugo de piña": "🍍", 
+            "jugo de fresa": "🍓", "jugo de naranja": "🍊"
         };
 
         function updateUserUI() {
@@ -209,34 +216,36 @@
             extraContainer.innerHTML = '';
             const colIdx = (user === "GIULY") ? 1 : (user === "ALEX") ? 3 : 5;
             
+            // 1. Render Lista Arriba (Sin Nota y sin Especiales)
             for (let i = 2; i < inventoryData.length; i++) {
                 const row = inventoryData[i];
                 if (!row[0] || row[0].toLowerCase() === "producto") continue;
                 
-                const isSpecial = excludeFromMain.some(item => item.toLowerCase() === row[0].toLowerCase().trim());
+                const prodClean = row[0].toLowerCase().trim();
+                const isSpecial = excludeFromMain.some(item => item.toLowerCase() === prodClean);
+                
                 if (isSpecial) continue;
 
-                const emoji = emojis[row[0].toLowerCase().trim()] || "📦";
+                const emoji = emojis[prodClean] || "📦";
                 container.innerHTML += createRowHtml(row[0], row[colIdx], colIdx, color, emoji);
             }
 
-            excludeFromMain.forEach(prodName => {
+            // 2. Render Lista Abajo (Especiales + Jugos)
+            // Se muestran en el orden de esta lista:
+            const bottomList = [
+                "Jamón rebanado", "Lomo de ternera", "Solomillo de Res", 
+                "Masa", "Jugo de manzana", "Jugo de piña", 
+                "Jugo de fresa", "Jugo de naranja"
+            ];
+
+            bottomList.forEach(prodName => {
                 const sheetRow = inventoryData.find(r => r[0] && r[0].toLowerCase().trim() === prodName.toLowerCase().trim());
+                // Solo se dibuja si existe en el Excel
                 if (sheetRow) {
                     const emoji = emojis[prodName.toLowerCase().trim()] || "✨";
                     extraContainer.innerHTML += createRowHtml(sheetRow[0], sheetRow[colIdx], colIdx, color, emoji);
                 }
             });
-
-            extraContainer.innerHTML += `
-                <div class="row" style="border-bottom: none; flex-direction: column; align-items: flex-start; margin-top:15px;">
-                    <div class="prod-name" style="color: ${color}">📝 Otros (Escribir nombre):</div>
-                    <input type="text" id="otherName" class="input-extra" placeholder="Ej: Chorizo, Queso...">
-                    <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 10px;">
-                        <span style="font-size: 0.8em; opacity: 0.7;">Cantidad:</span>
-                        <input type="number" id="otherQty" class="qty-input" placeholder="0" style="border: 2px solid ${color}">
-                    </div>
-                </div>`;
         }
 
         function createRowHtml(name, stock, col, color, emoji) {
@@ -264,14 +273,10 @@
                 }
             });
 
-            const oName = document.getElementById('otherName').value.trim();
-            const oQty = parseInt(document.getElementById('otherQty').value);
-            if (oName && !isNaN(oQty) && oQty !== 0) {
-                updates.push({ producto: oName, cantidad: oQty, userCol: userCol });
-            }
-
-            if (updates.length === 0) return alert("No hay cambios.");
+            if (updates.length === 0) return alert("No hay cambios para guardar.");
+            
             document.getElementById('loading-overlay').style.display = 'flex';
+            document.getElementById('loading-overlay').innerText = "Guardando...";
             
             for (let up of updates) { 
                 await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(up) }); 
