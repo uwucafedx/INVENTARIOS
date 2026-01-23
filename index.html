@@ -90,18 +90,18 @@
         let inventoryData = [];
         const userColors = { "GIULY": "#b4849f", "ALEX": "#a7a7df", "NASHIRA": "#6e4792" };
         
-        // ESTO VA EN LA SECCIÓN DE ABAJO (Todo lo demás irá arriba automáticamente)
+        // JUGOS Y CORTES VAN ABAJO
         const extraItems = [
             "jamon rebanado", "jamón rebanado", "lomo de ternera", "solomillo de res", 
-            "jamon cortado en cubos", "bolonia en rodajas", "medallon de carne", 
-            "fideos fetuccine", "masa"
+            "jamon cortado en cubos", "bolonia en rodajas", "medallon de carne", "medallón de carne",
+            "fideos fetuccine", "masa", 
+            "jugo de naranja", "jugo de piña", "jugo de fresa", "jugo de manzana"
         ];
 
-        // EMOJIS ACTUALIZADOS
         const emojis = { 
             "carne de venado": "🦌", "losa de carne": "🥩", "jamon": "🍖", "bolonias": "🥪",
             "jamon rebanado": "🥓", "jamón rebanado": "🥓", "lomo de ternera": "🥩", "solomillo de res": "🥩", 
-            "jamon cortado en cubos": "🍖", "bolonia en rodajas": "🍥", "medallon de carne": "🥩",
+            "jamon cortado en cubos": "🍖", "bolonia en rodajas": "🍥", "medallon de carne": "🥩", "medallón de carne": "🥩",
             "fideos fetuccine": "🍝", "masa": "🍜", 
             "naranja": "🍊", "jugo de naranja": "🍊", 
             "piña": "🍍", "jugo de piña": "🍍", 
@@ -187,7 +187,6 @@
                             <input type="number" class="qty-input" data-prod="${name}" data-col="${colIdx}" placeholder="0" inputmode="numeric">
                         </div>
                     </div>`;
-                // Si está en la lista de abajo, lo manda al contenedor extra. Si no, al principal de arriba.
                 if (extraItems.includes(name.toLowerCase())) extCont.innerHTML += html;
                 else cont.innerHTML += html;
             });
