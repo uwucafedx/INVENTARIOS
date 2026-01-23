@@ -58,7 +58,9 @@
             background: var(--p-violet); color: white; border: none; 
             padding: 8px 18px; border-radius: 10px; cursor: pointer; 
             font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            transition: transform 0.1s;
         }
+        .btn-save-mini:active { transform: scale(0.95); }
 
         .btn-save-full { color: white; border: none; padding: 12px; border-radius: 15px; cursor: pointer; font-size: 1.3em; width: 95%; max-width: 550px; margin-bottom: 40px; font-weight: bold; }
         
@@ -67,7 +69,7 @@
 </head>
 <body onload="updateUserUI()">
 
-    <div id="loading-overlay">Cargando 🐻🌸💀...</div>
+    <div id="loading-overlay">Cargando tus datos...</div>
 
     <div class="top-container">
         <h1>INVENTARIO</h1>
@@ -96,28 +98,39 @@
         <div id="extraContainer"></div>
     </div>
 
-    <button id="btnSaveBottom" class="btn-save-full" onclick="saveAllChanges()">💾 GUARDAR CAMBIOS FINAL</button>
+    <button id="btnSaveBottom" class="btn-save-full" onclick="saveAllChanges()">💾</button>
 
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwsO41veRFVbzPLycyBRC17lynjy_DzEwzyusDr2UWQvryFCn7ISwRg6HmIBLvkUqTHsA/exec'; 
         let inventoryData = [];
         const userColors = { "GIULY": "#b4849f", "ALEX": "#a7a7df", "NASHIRA": "#6e4792" };
         
-        // LISTA DEFINIDA: Estos van abajo. El resto se queda arriba.
+        // LISTA DE PRODUCTOS QUE VAN EN "Cortes Especiales y Otros"
         const extraItems = [
             "jamon rebanado", "lomo de ternera", "solomillo de res", 
-            "jamon cortado", "bolonia en rodajas", "medallon de carne", 
+            "jamon cortado en cubos", "bolonia en rodajas", "medallon de carne", 
             "fideos fetuccine", "masa", "jugo de naranja", 
             "jugo de piña", "jugo de fresa", "jugo de manzana"
         ];
 
+        // EMOJIS PARA TODO EL INVENTARIO
         const emojis = { 
-            "carne de venado": "🦌", "losa de carne": "🥩", "jamon": "🍖", "bolonias": "🥪", "aguas carbonatadas": "🥤",
-            "naranja": "🍊", "piña": "🍍", "fresa": "🍓", "manzana": "🍎",
-            "jamon rebanado": "🍖", "lomo de ternera": "🥩", "solomillo de res": "🥩", 
-            "jamon cortado": "🥓", "bolonia en rodajas": "🍖", "medallon de carne": "🥩",
-            "fideos fetuccine": "🍝", "masa": "🫕", "jugo de naranja": "🍊", 
-            "jugo de piña": "🍍", "jugo de fresa": "🍓", "jugo de manzana": "🍎"
+            "carne de venado": "🦌",
+            "losa de carne": "🥩",
+            "jamon": "🍖",
+            "bolonias": "🥪",
+            "jamon rebanado": "🥓", 
+            "lomo de ternera": "🥩", 
+            "solomillo de res": "🥩", 
+            "jamon cortado en cubos": "🍖",
+            "bolonia en rodajas": "🍥",
+            "medallon de carne": "🥩",
+            "fideos fetuccine": "🍝",
+            "masa": "🍜",
+            "jugo de naranja": "🍊", 
+            "jugo de piña": "🍍", 
+            "jugo de fresa": "🍓", 
+            "jugo de manzana": "🍎"
         };
 
         function timeSince(dateStr) {
@@ -202,13 +215,8 @@
                             <input type="number" class="qty-input" data-prod="${name}" data-col="${colIdx}" placeholder="0" inputmode="numeric">
                         </div>
                     </div>`;
-                
-                // Clasificación según tu pedido
-                if (extraItems.includes(name.toLowerCase())) {
-                    extCont.innerHTML += html;
-                } else {
-                    cont.innerHTML += html;
-                }
+                if (extraItems.includes(name.toLowerCase())) extCont.innerHTML += html;
+                else cont.innerHTML += html;
             });
         }
 
