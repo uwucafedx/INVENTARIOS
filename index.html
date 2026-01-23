@@ -47,21 +47,8 @@
 
         .section-title { text-align: center; color: var(--p-light); font-weight: bold; font-size: 0.75em; margin: 15px 0 8px 0; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; }
 
-        .save-container-mini {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            padding-right: 10px;
-        }
-        .btn-save-mini { 
-            background: var(--p-violet); color: white; border: none; 
-            padding: 8px 18px; border-radius: 10px; cursor: pointer; 
-            font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-            transition: transform 0.1s;
-        }
-        .btn-save-mini:active { transform: scale(0.95); }
-
+        .save-container-mini { display: flex; justify-content: flex-end; margin-top: 5px; margin-bottom: 15px; padding-right: 10px; }
+        .btn-save-mini { background: var(--p-violet); color: white; border: none; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.4); }
         .btn-save-full { background: var(--p-violet); color: white; border: none; padding: 12px; border-radius: 15px; cursor: pointer; font-size: 1.3em; width: 95%; max-width: 550px; margin-bottom: 40px; font-weight: bold; }
         
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; color: white; font-weight: bold; }
@@ -69,7 +56,7 @@
 </head>
 <body onload="updateUserUI()">
 
-    <div id="loading-overlay">Cargando tus datos 👍🏻...</div>
+    <div id="loading-overlay">Cargando tus datos...</div>
 
     <div class="top-container">
         <h1>INVENTARIO</h1>
@@ -89,11 +76,9 @@
 
     <div class="inventory-card" id="mainCard">
         <div id="listContainer"></div>
-        
         <div class="save-container-mini">
             <button id="btnSaveTop" class="btn-save-mini" onclick="saveAllChanges()">💾</button>
         </div>
-
         <div class="section-title">✨ Cortes Especiales y Otros</div>
         <div id="extraContainer"></div>
     </div>
@@ -105,19 +90,18 @@
         let inventoryData = [];
         const userColors = { "GIULY": "#b4849f", "ALEX": "#a7a7df", "NASHIRA": "#6e4792" };
         
-        // LISTA DE PRODUCTOS QUE VAN EN "Cortes Especiales y Otros"
+        // ESTO VA EN LA SECCIÓN DE ABAJO (Todo lo demás irá arriba automáticamente)
         const extraItems = [
             "jamon rebanado", "jamón rebanado", "lomo de ternera", "solomillo de res", 
-            "jamon cortado en cubos", "jamon cortado", "bolonia en rodajas", "medallon de carne", "medallon de carne",
-            "fideos fetuccine", "masa", "jugo de naranja", "naranja",
-            "jugo de piña", "piña", "jugo de fresa", "fresa", "jugo de manzana", "manzana"
+            "jamon cortado en cubos", "bolonia en rodajas", "medallon de carne", 
+            "fideos fetuccine", "masa"
         ];
 
         // EMOJIS ACTUALIZADOS
         const emojis = { 
             "carne de venado": "🦌", "losa de carne": "🥩", "jamon": "🍖", "bolonias": "🥪",
             "jamon rebanado": "🥓", "jamón rebanado": "🥓", "lomo de ternera": "🥩", "solomillo de res": "🥩", 
-            "jamon cortado en cubos": "🍖", "jamon cortado": "🍖", "bolonia en rodajas": "🍥", "medallon de carne": "🥩",
+            "jamon cortado en cubos": "🍖", "bolonia en rodajas": "🍥", "medallon de carne": "🥩",
             "fideos fetuccine": "🍝", "masa": "🍜", 
             "naranja": "🍊", "jugo de naranja": "🍊", 
             "piña": "🍍", "jugo de piña": "🍍", 
@@ -141,13 +125,8 @@
 
         function toggleSign(btn) {
             const user = document.getElementById('userSelect').value;
-            if (btn.innerText === "+") {
-                btn.innerText = "-";
-                btn.style.backgroundColor = "var(--error-red)";
-            } else {
-                btn.innerText = "+";
-                btn.style.backgroundColor = userColors[user];
-            }
+            btn.innerText = (btn.innerText === "+") ? "-" : "+";
+            btn.style.backgroundColor = (btn.innerText === "-") ? "var(--error-red)" : userColors[user];
         }
 
         function setVacio(btn, stockActual) {
@@ -208,6 +187,7 @@
                             <input type="number" class="qty-input" data-prod="${name}" data-col="${colIdx}" placeholder="0" inputmode="numeric">
                         </div>
                     </div>`;
+                // Si está en la lista de abajo, lo manda al contenedor extra. Si no, al principal de arriba.
                 if (extraItems.includes(name.toLowerCase())) extCont.innerHTML += html;
                 else cont.innerHTML += html;
             });
@@ -216,7 +196,6 @@
         async function saveAllChanges() {
             const inputs = document.querySelectorAll('.qty-input');
             const nota = document.getElementById('notaGeneral').value;
-            if (inputs.length === 0) return;
             const userCol = parseInt(inputs[0].getAttribute('data-col'));
             let updates = [];
 
