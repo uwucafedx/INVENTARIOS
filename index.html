@@ -56,7 +56,7 @@
 </head>
 <body onload="updateUserUI()">
 
-    <div id="loading-overlay">Cargando tus datos👍🏻...</div>
+    <div id="loading-overlay">Cargando tus datos 👍🏻🌸...</div>
 
     <div class="top-container">
         <h1>INVENTARIO</h1>
@@ -90,19 +90,20 @@
         let inventoryData = [];
         const userColors = { "GIULY": "#b4849f", "ALEX": "#a7a7df", "NASHIRA": "#6e4792" };
         
-        // JUGOS Y CORTES VAN ABAJO
+        // CORTES, JUGOS, MASA Y FIDEOS VAN ABAJO
         const extraItems = [
-            "jamon rebanado", "jamón rebanado", "lomo de ternera", "solomillo de res", 
-            "jamon cortado en cubos", "bolonia en rodajas", "medallon de carne", "medallón de carne",
-            "fideos fetuccine", "masa", 
+            "jamon rebanado", "jamón rebanado", "lomo de ternera", "solomillo de res", "solomillo de res",
+            "jamon cortado en cubos", "jamón cortado en cubos", "bolonia en rodajas", "medallon de carne", "medallón de carne",
+            "fideos fettuccie", "masa", 
             "jugo de naranja", "jugo de piña", "jugo de fresa", "jugo de manzana"
         ];
 
         const emojis = { 
             "carne de venado": "🦌", "losa de carne": "🥩", "jamon": "🍖", "bolonias": "🥪",
             "jamon rebanado": "🥓", "jamón rebanado": "🥓", "lomo de ternera": "🥩", "solomillo de res": "🥩", 
-            "jamon cortado en cubos": "🍖", "bolonia en rodajas": "🍥", "medallon de carne": "🥩", "medallón de carne": "🥩",
-            "fideos fetuccine": "🍝", "masa": "🍜", 
+            "jamon cortado en cubos": "🍖", "jamón cortado en cubos": "🍖", "bolonia en rodajas": "🍥", 
+            "medallon de carne": "🥩", "medallón de carne": "🥩",
+            "fideos fettuccie": "🍝", "masa": "🍜", 
             "naranja": "🍊", "jugo de naranja": "🍊", 
             "piña": "🍍", "jugo de piña": "🍍", 
             "fresa": "🍓", "jugo de fresa": "🍓", 
@@ -195,6 +196,7 @@
         async function saveAllChanges() {
             const inputs = document.querySelectorAll('.qty-input');
             const nota = document.getElementById('notaGeneral').value;
+            if (inputs.length === 0) return;
             const userCol = parseInt(inputs[0].getAttribute('data-col'));
             let updates = [];
 
