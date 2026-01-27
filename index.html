@@ -69,7 +69,6 @@
         USUARIO: 
         <select id="userSelect" onchange="updateUserUI();">
             <option value="GIULY" style="background-color: #b4849f; color: white;">GIULY</option>
-            <option value="ALEX" style="background-color: #a7a7df; color: white;">ALEX</option>
             <option value="NASHIRA" style="background-color: #6e4792; color: white;">NASHIRA</option>
         </select>
     </div>
@@ -88,11 +87,10 @@
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwsO41veRFVbzPLycyBRC17lynjy_DzEwzyusDr2UWQvryFCn7ISwRg6HmIBLvkUqTHsA/exec'; 
         let inventoryData = [];
-        const userColors = { "GIULY": "#b4849f", "ALEX": "#a7a7df", "NASHIRA": "#6e4792" };
+        const userColors = { "GIULY": "#b4849f", "NASHIRA": "#6e4792" };
         
-        // CORTES, JUGOS, MASA Y FIDEOS VAN ABAJO
         const extraItems = [
-            "jamon rebanado", "jamón rebanado", "lomo de ternera", "solomillo de res", "solomillo de res",
+            "jamon rebanado", "jamón rebanado", "lomo de ternera", "solomillo de res",
             "jamon cortado en cubos", "jamón cortado en cubos", "bolonia en rodajas", "medallon de carne", "medallón de carne",
             "fideos fettuccie", "masa", 
             "jugo de naranja", "jugo de piña", "jugo de fresa", "jugo de manzana"
@@ -164,7 +162,10 @@
             const cont = document.getElementById('listContainer');
             const extCont = document.getElementById('extraContainer');
             cont.innerHTML = ''; extCont.innerHTML = '';
-            const colIdx = (user === "GIULY") ? 1 : (user === "ALEX") ? 3 : 5;
+            
+            // Si Giuly es Col 1, Nashira ahora es Col 3 (antes era 5) 
+            // Esto depende de cómo quedó tu Excel tras eliminar a Alex.
+            const colIdx = (user === "GIULY") ? 1 : 3;
             
             inventoryData.forEach((row, i) => {
                 if (i < 2 || !row[0]) return;
